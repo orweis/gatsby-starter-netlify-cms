@@ -1,8 +1,13 @@
+# Netlify build settings: https://docs.netlify.com/configure-builds/file-based-configuration/
 [build]
   publish = "public"
   command = "npm run build"
+  # Netlify Functions (see lambda/hello.js), served at /.netlify/functions/<name>
   functions = "lambda"
+
 [build.environment]
-  NODE_VERSION = "12"
-  YARN_VERSION = "1.22.4"
-  YARN_FLAGS = "--no-ignore-optional"
+  # Keep in sync with .nvmrc and "engines" in package.json.
+  NODE_VERSION = "20"
+
+# Security and caching headers are generated into public/_headers by
+# gatsby-plugin-netlify (see gatsby-config.js).

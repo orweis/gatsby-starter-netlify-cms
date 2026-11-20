@@ -2,7 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
 import Layout from '../components/Layout'
+import Seo from '../components/Seo'
 import Content, { HTMLContent } from '../components/Content'
+
+export const Head = ({ data, location }) => (
+  <Seo
+    title={data.markdownRemark.frontmatter.title}
+    pathname={location.pathname}
+  />
+)
+
+Head.propTypes = { data: PropTypes.object, location: PropTypes.object }
 
 export const AboutPageTemplate = ({ title, content, contentComponent }) => {
   const PageContent = contentComponent || Content
@@ -27,8 +37,8 @@ export const AboutPageTemplate = ({ title, content, contentComponent }) => {
 
 AboutPageTemplate.propTypes = {
   title: PropTypes.string.isRequired,
-  content: PropTypes.string,
-  contentComponent: PropTypes.func,
+  content: PropTypes.node,
+  contentComponent: PropTypes.elementType,
 }
 
 const AboutPage = ({ data }) => {
@@ -46,7 +56,12 @@ const AboutPage = ({ data }) => {
 }
 
 AboutPage.propTypes = {
-  data: PropTypes.object.isRequired,
+  data: PropTypes.shape({
+    markdownRemark: PropTypes.shape({
+      html: PropTypes.string,
+      frontmatter: PropTypes.shape({ title: PropTypes.string }),
+    }),
+  }).isRequired,
 }
 
 export default AboutPage

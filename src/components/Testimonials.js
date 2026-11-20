@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { v4 } from 'uuid'
 
-const Testimonials = ({ testimonials }) => (
+const Testimonials = ({ testimonials = [] }) => (
   <div>
-    {testimonials.map((testimonial) => (
-      <article key={v4()} className="message">
+    {testimonials.map((testimonial, index) => (
+      // Index keys are stable here: the list is static content, never reordered
+      // at runtime. (A random key per render would remount every item.)
+      <article key={index} className="message">
         <div className="message-body">
           {testimonial.quote}
           <br />

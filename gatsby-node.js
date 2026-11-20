@@ -1,87 +1,64 @@
-const _ = require('lodash')
-const path = require('path')
 const { createFilePath } = require('gatsby-source-filesystem')
-const { fmImagesToRelative } = require('gatsby-remark-relative-images')
+const { tagPath, collectTags } = require('./src/utils/tags')
+const { resolveTemplate } = require('./src/utils/templates')
 
-exports.createPages = ({ actions, graphql }) => {
+exports.createPages = async ({ actions, graphql, reporter }) => {
   const { createPage } = actions
 
-  return graphql(`
+  const result = await graphql(`
     {
-      allMarkdownRemark(limit: 1000) {
-        edges {
-          node {
-            id
-            fields {
-              slug
-            }
-            frontmatter {
-              tags
-              templateKey
-            }
+      allMarkdownRemark {
+        nodes {
+          id
+          fileAbsolutePath
+          fields {
+            slug
+          }
+          frontmatter {
+            tags
+            templateKey
           }
         }
       }
     }
-  `).then((result) => {
-    if (result.errors) {
-      result.errors.forEach((e) => console.error(e.toString()))
-      return Promise.reject(result.errors)
-    }
+  `)
 
-    const posts = result.data.allMarkdownRemark.edges
+  if (result.errors) {
+    reporter.panicOnBuild('Error loading markdown content', result.errors)
+    return
+  }
 
-    posts.forEach((edge) => {
-      const id = edge.node.id
-      createPage({
-        path: edge.node.fields.slug,
-        tags: edge.node.frontmatter.tags,
-        component: path.resolve(
-          `src/templates/${String(edge.node.frontmatter.templateKey)}.js`
-        ),
-        // additional data can be passed via context
-        context: {
-          id,
-        },
-      })
+  const pages = result.data.allMarkdownRemark.nodes
+
+  // One page per markdown file, rendered with src/templates/<templateKey>.js.
+  pages.forEach((node) => {
+    createPage({
+      path: node.fields.slug,
+      component: resolveTemplate(node.frontmatter.templateKey, {
+        source: node.fileAbsolutePath,
+      }),
+      context: { id: node.id },
     })
+  })
 
-    // Tag pages:
-    let tags = []
-    // Iterate through each post, putting all found tags into `tags`
-    posts.forEach((edge) => {
-      if (_.get(edge, `node.frontmatter.tags`)) {
-        tags = tags.concat(edge.node.frontmatter.tags)
-      }
-    })
-    // Eliminate duplicate tags
-    tags = _.uniq(tags)
-
-    // Make tag pages
-    tags.forEach((tag) => {
-      const tagPath = `/tags/${_.kebabCase(tag)}/`
-
-      createPage({
-        path: tagPath,
-        component: path.resolve(`src/templates/tags.js`),
-        context: {
-          tag,
-        },
-      })
+  // One page per unique tag.
+  const tagTemplate = resolveTemplate('tags')
+  collectTags(pages).forEach((tag) => {
+    createPage({
+      path: tagPath(tag),
+      component: tagTemplate,
+      context: { tag },
     })
   })
 }
 
 exports.onCreateNode = ({ node, actions, getNode }) => {
-  const { createNodeField } = actions
-  fmImagesToRelative(node) // convert image paths for gatsby images
+  if (node.internal.type !== 'MarkdownRemark') return
 
-  if (node.internal.type === `MarkdownRemark`) {
-    const value = createFilePath({ node, getNode })
-    createNodeField({
-      name: `slug`,
-      node,
-      value,
-    })
-  }
+  // e.g. src/pages/blog/2017-01-04-foo.md -> /blog/2017-01-04-foo/
+  actions.createNodeField({
+    name: 'slug',
+    node,
+    value: createFilePath({ node, getNode }),
+  })
 }
