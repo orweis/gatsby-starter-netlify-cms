@@ -1,9 +1,27 @@
-# Project dependencies
-# https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git
-node_modules
+# Dependencies
+node_modules/
+
+# Gatsby
 .cache/
-# Build directory
 public/
-static/admin/*.bundle.*
+
+# Tests
+coverage/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment (may contain secrets)
+.env
+.env.*
+!.env.example
+
+# Netlify CLI
+.netlify/
+
+# Editors / OS
+.vscode/
+.idea/
 .DS_Store
-yarn-error.log
