@@ -31,6 +31,12 @@ Recommendations for sites built from this starter:
   `static/admin/config.yml` so that previewing untrusted content in the CMS
   does not run scripts in an editor's (authenticated) browser session.
 - Protect the deploy branch on GitHub and review changes made by new editors.
+- The published site does **not** sanitize Markdown HTML (only the CMS preview
+  does), because the starter's content relies on raw HTML such as embedded
+  iframes. If editors are not fully trusted, sanitize the HTML at build time
+  (for example with a `sanitize-html` allowlist applied in
+  `src/components/Content.js` or a remark/rehype sanitizing plugin) before
+  rendering it.
 
 ## Headers
 
@@ -43,9 +49,13 @@ test `/admin/` thoroughly.
 
 ## Dependency advisories
 
-`npm audit --omit=dev` still reports advisories (no critical ones at the time
-of the 2.0.0 release) in packages that Gatsby 5, Decap CMS 3 and `sharp`
+`npm audit --omit=dev` still reports advisories (62 production advisories,
+none critical, measured on 2026-11-20 for the 2.0.0 release) in packages that Gatsby 5, Decap CMS 3 and `sharp`
 depend on. Most affect build-time tooling or the development server rather
 than the generated static files. They need upstream releases to fix; Dependabot
 proposes updates weekly. `package.json` `overrides` pin patched versions of
 `lodash` and `trim` where that is safe.
+
+ESLint stays on 9.x (a development-only dependency that no longer receives
+updates) until `eslint-plugin-react` and `eslint-plugin-jsx-a11y` support
+ESLint 10. It is not part of the built site.

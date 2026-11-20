@@ -11,7 +11,7 @@ A major upgrade of the whole toolchain. See the
 
 ### Breaking changes
 
-- Requires Node.js 20 or newer (`engines`, `.nvmrc`, Netlify `NODE_VERSION`
+- Requires Node.js 22 or newer (`engines`, `.nvmrc`, Netlify `NODE_VERSION`
   were Node 12).
 - npm replaces Yarn: `yarn.lock` was removed in favor of `package-lock.json`.
 - Gatsby 2 → 5 and React 16 → 19. GraphQL queries use the Gatsby 5 `sort` and
@@ -26,6 +26,8 @@ A major upgrade of the whole toolchain. See the
   malformed or unknown `templateKey`.
 - `node-sass` → `sass` (Dart Sass); `uuid`, `lodash-webpack-plugin` and
   `react-helmet` were removed.
+- `package.json` is now `"private": true`, so `npm publish` is refused. This
+  is a site, not a library; remove the flag if you really publish it.
 
 ### Security
 
@@ -50,7 +52,7 @@ A major upgrade of the whole toolchain. See the
 - Jest + Testing Library test suite (`npm test`), including a content check
   that Markdown, `config.yml` and CMS previews stay consistent.
 - ESLint (flat config), Prettier config, `.editorconfig`, `.nvmrc`.
-- GitHub Actions CI (lint, format, tests, build on Node 20 and 22) with pinned
+- GitHub Actions CI (lint, format, tests, build on Node 22 and 24) with pinned
   actions and read-only permissions.
 - `npm run cms` (local CMS editing with `decap-server`, `local_backend: true`),
   `npm run serve`, `npm run check`, `npm run test:coverage`.
@@ -59,6 +61,10 @@ A major upgrade of the whole toolchain. See the
 
 ### Changed
 
+- `static/admin/config.yml` sets `local_backend: true`. Decap uses it only
+  when the CMS is opened on `localhost` and `decap-server` (`npm run cms`) is
+  running; production and deploy previews are unaffected. Remove the line to
+  always edit the remote repository, even locally.
 - Pages use their own title in `<title>` (previously most used the site title).
 - Contact forms show an inline error and stay on the page when the submission
   fails (previously non-2xx responses still went to the thank-you page and

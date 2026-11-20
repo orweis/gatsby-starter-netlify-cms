@@ -12,7 +12,7 @@ This project derives from
 [netlify-templates/gatsby-starter-netlify-cms](https://github.com/netlify-templates/gatsby-starter-netlify-cms).
 
 > **Upgrading from 1.x?** Version 2.0.0 is a major upgrade (Gatsby 2 → 5,
-> React 16 → 19, Netlify CMS → Decap CMS, npm instead of Yarn, Node 20+).
+> React 16 → 19, Netlify CMS → Decap CMS, npm instead of Yarn, Node 22+).
 > Read the [migration guide](#migrating-from-1x) and the
 > [CHANGELOG](CHANGELOG.md) first.
 
@@ -132,7 +132,7 @@ registered in `src/cms/cms.js`. The test suite checks that these stay in sync.
 1. Push this repository to GitHub (or GitLab/Bitbucket).
 2. In Netlify, choose **Add new site → Import an existing project** and pick the
    repository. The build settings come from `netlify.toml`
-   (`npm run build`, publish `public/`, Node 20).
+   (`npm run build`, publish `public/`, Node 22).
 3. Enable **Identity** for the site, then under **Identity → Registration**
    choose **Invite only** and invite your editors.
 4. Under **Identity → Services**, enable **Git Gateway**.
@@ -176,16 +176,16 @@ resolution (including rejection of path traversal in `templateKey`), tag
 helpers, form submission (success, HTTP errors, network errors), components,
 CMS preview templates, the Netlify Function, and a content check that every
 Markdown file, the CMS configuration and the registered previews agree with
-each other. CI runs lint, format check, tests and a full build on Node 20
-and 22.
+each other. CI runs lint, format check, tests and a full build on Node 22
+and 24.
 
 ## Migrating from 1.x
 
 2.0.0 changes the toolchain and some component APIs. If you started a site from
 1.x:
 
-- **Node.js 20+ and npm.** `yarn.lock` was replaced by `package-lock.json`.
-  Delete `node_modules/` and run `npm install`. Netlify builds use Node 20.
+- **Node.js 22+ and npm.** `yarn.lock` was replaced by `package-lock.json`.
+  Delete `node_modules/` and run `npm install`. Netlify builds use Node 22 (Node 20 reached end-of-life in April 2026).
 - **Netlify CMS → Decap CMS.** `netlify-cms-app` and
   `gatsby-plugin-netlify-cms` were replaced by `decap-cms-app` and
   `gatsby-plugin-decap-cms`. Change `import CMS from 'netlify-cms-app'` to

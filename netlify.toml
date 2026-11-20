@@ -7,7 +7,7 @@
 
 [build.environment]
   # Keep in sync with .nvmrc and "engines" in package.json.
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
 
 # Security and caching headers are generated into public/_headers by
 # gatsby-plugin-netlify (see gatsby-config.js).

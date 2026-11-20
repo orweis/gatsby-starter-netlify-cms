@@ -5,7 +5,7 @@ contributing, please read the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Setup
 
-You need Node.js 20 or newer (`nvm use` reads `.nvmrc`) and npm.
+You need Node.js 22 or newer (`nvm use` reads `.nvmrc`) and npm.
 
 ```sh
 git clone <repository-url>
