@@ -1,7 +1,15 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import Layout from '../../components/Layout'
+import Seo from '../../components/Seo'
 
-export default () => (
+export const Head = ({ location }) => (
+  <Seo title="Thank you" pathname={location.pathname} />
+)
+
+Head.propTypes = { location: PropTypes.object }
+
+const ThanksPage = () => (
   <Layout>
     <section className="section">
       <div className="container">
@@ -13,3 +21,5 @@ export default () => (
     </section>
   </Layout>
 )
+
+export default ThanksPage

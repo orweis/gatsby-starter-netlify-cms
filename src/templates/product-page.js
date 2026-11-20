@@ -6,25 +6,34 @@ import Features from '../components/Features'
 import Testimonials from '../components/Testimonials'
 import Pricing from '../components/Pricing'
 import PreviewCompatibleImage from '../components/PreviewCompatibleImage'
+import Seo from '../components/Seo'
+import { backgroundImage } from '../utils/image'
+
+export const Head = ({ data, location }) => (
+  <Seo
+    title={data.markdownRemark.frontmatter.title}
+    pathname={location.pathname}
+  />
+)
+
+Head.propTypes = { data: PropTypes.object, location: PropTypes.object }
 
 export const ProductPageTemplate = ({
   image,
   title,
   heading,
   description,
-  intro,
-  main,
-  testimonials,
+  intro = {},
+  main = {},
+  testimonials = [],
   fullImage,
-  pricing,
+  pricing = {},
 }) => (
   <div className="content">
     <div
       className="full-width-image-container margin-top-0"
       style={{
-        backgroundImage: `url(${
-          !!image.childImageSharp ? image.childImageSharp.fluid.src : image
-        })`,
+        backgroundImage: backgroundImage(image),
       }}
     >
       <h2
@@ -64,18 +73,18 @@ export const ProductPageTemplate = ({
                   <div className="tile">
                     <div className="tile is-parent is-vertical">
                       <article className="tile is-child">
-                        <PreviewCompatibleImage imageInfo={main.image1} />
+                        <PreviewCompatibleImage imageInfo={main.image1 || {}} />
                       </article>
                     </div>
                     <div className="tile is-parent">
                       <article className="tile is-child">
-                        <PreviewCompatibleImage imageInfo={main.image2} />
+                        <PreviewCompatibleImage imageInfo={main.image2 || {}} />
                       </article>
                     </div>
                   </div>
                   <div className="tile is-parent">
                     <article className="tile is-child">
-                      <PreviewCompatibleImage imageInfo={main.image3} />
+                      <PreviewCompatibleImage imageInfo={main.image3 || {}} />
                     </article>
                   </div>
                 </div>
@@ -84,11 +93,7 @@ export const ProductPageTemplate = ({
               <div
                 className="full-width-image-container"
                 style={{
-                  backgroundImage: `url(${
-                    fullImage.childImageSharp
-                      ? fullImage.childImageSharp.fluid.src
-                      : fullImage
-                  })`,
+                  backgroundImage: backgroundImage(fullImage),
                 }}
               />
               <h2 className="has-text-weight-semibold is-size-2">
@@ -115,9 +120,9 @@ ProductPageTemplate.propTypes = {
   main: PropTypes.shape({
     heading: PropTypes.string,
     description: PropTypes.string,
-    image1: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
-    image2: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
-    image3: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
+    image1: PropTypes.object,
+    image2: PropTypes.object,
+    image3: PropTypes.object,
   }),
   testimonials: PropTypes.array,
   fullImage: PropTypes.oneOfType([PropTypes.object, PropTypes.string]),
@@ -165,9 +170,7 @@ export const productPageQuery = graphql`
         title
         image {
           childImageSharp {
-            fluid(maxWidth: 2048, quality: 100) {
-              ...GatsbyImageSharpFluid
-            }
+            gatsbyImageData(quality: 100, layout: FULL_WIDTH)
           }
         }
         heading
@@ -176,9 +179,7 @@ export const productPageQuery = graphql`
           blurbs {
             image {
               childImageSharp {
-                fluid(maxWidth: 240, quality: 64) {
-                  ...GatsbyImageSharpFluid
-                }
+                gatsbyImageData(width: 240, quality: 64, layout: CONSTRAINED)
               }
             }
             text
@@ -193,9 +194,7 @@ export const productPageQuery = graphql`
             alt
             image {
               childImageSharp {
-                fluid(maxWidth: 526, quality: 92) {
-                  ...GatsbyImageSharpFluid
-                }
+                gatsbyImageData(width: 526, quality: 92, layout: CONSTRAINED)
               }
             }
           }
@@ -203,9 +202,7 @@ export const productPageQuery = graphql`
             alt
             image {
               childImageSharp {
-                fluid(maxWidth: 526, quality: 92) {
-                  ...GatsbyImageSharpFluid
-                }
+                gatsbyImageData(width: 526, quality: 92, layout: CONSTRAINED)
               }
             }
           }
@@ -213,9 +210,7 @@ export const productPageQuery = graphql`
             alt
             image {
               childImageSharp {
-                fluid(maxWidth: 1075, quality: 72) {
-                  ...GatsbyImageSharpFluid
-                }
+                gatsbyImageData(width: 1075, quality: 72, layout: CONSTRAINED)
               }
             }
           }
@@ -226,9 +221,7 @@ export const productPageQuery = graphql`
         }
         full_image {
           childImageSharp {
-            fluid(maxWidth: 2048, quality: 100) {
-              ...GatsbyImageSharpFluid
-            }
+            gatsbyImageData(quality: 100, layout: FULL_WIDTH)
           }
         }
         pricing {

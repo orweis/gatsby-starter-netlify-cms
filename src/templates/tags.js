@@ -1,47 +1,66 @@
 import React from 'react'
-import { Helmet } from 'react-helmet'
+import PropTypes from 'prop-types'
 import { Link, graphql } from 'gatsby'
 import Layout from '../components/Layout'
+import Seo from '../components/Seo'
+import { tagHeading } from '../utils/tags'
 
-class TagRoute extends React.Component {
-  render() {
-    const posts = this.props.data.allMarkdownRemark.edges
-    const postLinks = posts.map((post) => (
-      <li key={post.node.fields.slug}>
-        <Link to={post.node.fields.slug}>
-          <h2 className="is-size-2">{post.node.frontmatter.title}</h2>
-        </Link>
-      </li>
-    ))
-    const tag = this.props.pageContext.tag
-    const title = this.props.data.site.siteMetadata.title
-    const totalCount = this.props.data.allMarkdownRemark.totalCount
-    const tagHeader = `${totalCount} post${
-      totalCount === 1 ? '' : 's'
-    } tagged with “${tag}”`
+export const Head = ({ data, pageContext, location }) => (
+  <Seo
+    title={`${pageContext.tag} | ${data.site.siteMetadata.title}`}
+    pathname={location.pathname}
+  />
+)
 
-    return (
-      <Layout>
-        <section className="section">
-          <Helmet title={`${tag} | ${title}`} />
-          <div className="container content">
-            <div className="columns">
-              <div
-                className="column is-10 is-offset-1"
-                style={{ marginBottom: '6rem' }}
-              >
-                <h3 className="title is-size-4 is-bold-light">{tagHeader}</h3>
-                <ul className="taglist">{postLinks}</ul>
-                <p>
-                  <Link to="/tags/">Browse all tags</Link>
-                </p>
-              </div>
+Head.propTypes = {
+  data: PropTypes.object,
+  pageContext: PropTypes.object,
+  location: PropTypes.object,
+}
+
+const TagRoute = ({ data, pageContext }) => {
+  const { nodes: posts, totalCount } = data.allMarkdownRemark
+
+  return (
+    <Layout>
+      <section className="section">
+        <div className="container content">
+          <div className="columns">
+            <div
+              className="column is-10 is-offset-1"
+              style={{ marginBottom: '6rem' }}
+            >
+              <h3 className="title is-size-4 is-bold-light">
+                {tagHeading(totalCount, pageContext.tag)}
+              </h3>
+              <ul className="taglist">
+                {posts.map((post) => (
+                  <li key={post.fields.slug}>
+                    <Link to={post.fields.slug}>
+                      <h2 className="is-size-2">{post.frontmatter.title}</h2>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+              <p>
+                <Link to="/tags/">Browse all tags</Link>
+              </p>
             </div>
           </div>
-        </section>
-      </Layout>
-    )
-  }
+        </div>
+      </section>
+    </Layout>
+  )
+}
+
+TagRoute.propTypes = {
+  data: PropTypes.shape({
+    allMarkdownRemark: PropTypes.shape({
+      totalCount: PropTypes.number,
+      nodes: PropTypes.array,
+    }),
+  }).isRequired,
+  pageContext: PropTypes.shape({ tag: PropTypes.string }).isRequired,
 }
 
 export default TagRoute
@@ -54,19 +73,16 @@ export const tagPageQuery = graphql`
       }
     }
     allMarkdownRemark(
-      limit: 1000
-      sort: { fields: [frontmatter___date], order: DESC }
+      sort: { frontmatter: { date: DESC } }
       filter: { frontmatter: { tags: { in: [$tag] } } }
     ) {
       totalCount
-      edges {
-        node {
-          fields {
-            slug
-          }
-          frontmatter {
-            title
-          }
+      nodes {
+        fields {
+          slug
+        }
+        frontmatter {
+          title
         }
       }
     }

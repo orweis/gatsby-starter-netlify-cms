@@ -35,7 +35,7 @@ const ProductPagePreview = ({ entry, getAsset }) => {
           alt: entry.getIn(['data', 'main', 'image3', 'alt']),
         },
       }}
-      fullImage={entry.getIn(['data', 'full_image'])}
+      fullImage={getAsset(entry.getIn(['data', 'full_image']))}
       testimonials={testimonials}
       pricing={{
         heading: entry.getIn(['data', 'pricing', 'heading']),
@@ -49,8 +49,8 @@ const ProductPagePreview = ({ entry, getAsset }) => {
 ProductPagePreview.propTypes = {
   entry: PropTypes.shape({
     getIn: PropTypes.func,
-  }),
-  getAsset: PropTypes.func,
+  }).isRequired,
+  getAsset: PropTypes.func.isRequired,
 }
 
 export default ProductPagePreview

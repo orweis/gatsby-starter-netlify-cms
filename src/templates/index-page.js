@@ -3,25 +3,32 @@ import PropTypes from 'prop-types'
 import { Link, graphql } from 'gatsby'
 
 import Layout from '../components/Layout'
+import Seo from '../components/Seo'
 import Features from '../components/Features'
 import BlogRoll from '../components/BlogRoll'
+import { backgroundImage } from '../utils/image'
+
+export const Head = ({ location }) => <Seo pathname={location.pathname} />
+
+Head.propTypes = { location: PropTypes.object }
 
 export const IndexPageTemplate = ({
   image,
   title,
   heading,
   subheading,
-  mainpitch,
+  mainpitch = {},
   description,
-  intro,
+  intro = {},
+  // The blog roll runs a static GraphQL query, which is unavailable in the
+  // CMS preview; the preview passes a placeholder instead.
+  latestStories = <BlogRoll />,
 }) => (
   <div>
     <div
       className="full-width-image margin-top-0"
       style={{
-        backgroundImage: `url(${
-          !!image.childImageSharp ? image.childImageSharp.fluid.src : image
-        })`,
+        backgroundImage: backgroundImage(image),
         backgroundPosition: `top left`,
         backgroundAttachment: `fixed`,
       }}
@@ -98,7 +105,7 @@ export const IndexPageTemplate = ({
                   <h3 className="has-text-weight-semibold is-size-2">
                     Latest stories
                   </h3>
-                  <BlogRoll />
+                  {latestStories}
                   <div className="column is-12 has-text-centered">
                     <Link className="btn" to="/blog">
                       Read more
@@ -124,6 +131,7 @@ IndexPageTemplate.propTypes = {
   intro: PropTypes.shape({
     blurbs: PropTypes.array,
   }),
+  latestStories: PropTypes.node,
 }
 
 const IndexPage = ({ data }) => {
@@ -161,9 +169,7 @@ export const pageQuery = graphql`
         title
         image {
           childImageSharp {
-            fluid(maxWidth: 2048, quality: 100) {
-              ...GatsbyImageSharpFluid
-            }
+            gatsbyImageData(quality: 100, layout: FULL_WIDTH)
           }
         }
         heading
@@ -177,9 +183,7 @@ export const pageQuery = graphql`
           blurbs {
             image {
               childImageSharp {
-                fluid(maxWidth: 240, quality: 64) {
-                  ...GatsbyImageSharpFluid
-                }
+                gatsbyImageData(width: 240, quality: 64, layout: CONSTRAINED)
               }
             }
             text

@@ -1,10 +1,25 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { kebabCase } from 'lodash'
-import { Helmet } from 'react-helmet'
 import { graphql, Link } from 'gatsby'
 import Layout from '../components/Layout'
+import Seo from '../components/Seo'
 import Content, { HTMLContent } from '../components/Content'
+import { tagPath } from '../utils/tags'
+
+export const Head = ({ data, location }) => {
+  const { title, description } = data.markdownRemark.frontmatter
+  return (
+    <Seo
+      title={`${title} | Blog`}
+      description={description}
+      pathname={location.pathname}
+    >
+      <meta property="og:type" content="article" />
+    </Seo>
+  )
+}
+
+Head.propTypes = { data: PropTypes.object, location: PropTypes.object }
 
 export const BlogPostTemplate = ({
   content,
@@ -12,13 +27,11 @@ export const BlogPostTemplate = ({
   description,
   tags,
   title,
-  helmet,
 }) => {
   const PostContent = contentComponent || Content
 
   return (
     <section className="section">
-      {helmet || ''}
       <div className="container content">
         <div className="columns">
           <div className="column is-10 is-offset-1">
@@ -32,8 +45,8 @@ export const BlogPostTemplate = ({
                 <h4>Tags</h4>
                 <ul className="taglist">
                   {tags.map((tag) => (
-                    <li key={tag + `tag`}>
-                      <Link to={`/tags/${kebabCase(tag)}/`}>{tag}</Link>
+                    <li key={tag}>
+                      <Link to={tagPath(tag)}>{tag}</Link>
                     </li>
                   ))}
                 </ul>
@@ -48,10 +61,10 @@ export const BlogPostTemplate = ({
 
 BlogPostTemplate.propTypes = {
   content: PropTypes.node.isRequired,
-  contentComponent: PropTypes.func,
+  contentComponent: PropTypes.elementType,
   description: PropTypes.string,
+  tags: PropTypes.arrayOf(PropTypes.string),
   title: PropTypes.string,
-  helmet: PropTypes.object,
 }
 
 const BlogPost = ({ data }) => {
@@ -63,15 +76,6 @@ const BlogPost = ({ data }) => {
         content={post.html}
         contentComponent={HTMLContent}
         description={post.frontmatter.description}
-        helmet={
-          <Helmet titleTemplate="%s | Blog">
-            <title>{`${post.frontmatter.title}`}</title>
-            <meta
-              name="description"
-              content={`${post.frontmatter.description}`}
-            />
-          </Helmet>
-        }
         tags={post.frontmatter.tags}
         title={post.frontmatter.title}
       />
@@ -82,7 +86,7 @@ const BlogPost = ({ data }) => {
 BlogPost.propTypes = {
   data: PropTypes.shape({
     markdownRemark: PropTypes.object,
-  }),
+  }).isRequired,
 }
 
 export default BlogPost

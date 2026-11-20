@@ -1,115 +1,129 @@
-import React from 'react'
-import { navigate } from 'gatsby-link'
+import React, { useState } from 'react'
+import PropTypes from 'prop-types'
+import { navigate } from 'gatsby'
 import Layout from '../../components/Layout'
+import Seo from '../../components/Seo'
+import { encodeForm, submitForm } from '../../utils/forms'
 
-function encode(data) {
-  return Object.keys(data)
-    .map((key) => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
-    .join('&')
-}
+export const Head = ({ location }) => (
+  <Seo title="Contact" pathname={location.pathname} />
+)
 
-export default class Index extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = { isValidated: false }
+Head.propTypes = { location: PropTypes.object }
+
+const ContactPage = () => {
+  const [values, setValues] = useState({})
+  const [error, setError] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setValues((current) => ({ ...current, [name]: value }))
   }
 
-  handleChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value })
-  }
-
-  handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const form = e.target
-    fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: encode({
-        'form-name': form.getAttribute('name'),
-        ...this.state,
-      }),
-    })
-      .then(() => navigate(form.getAttribute('action')))
-      .catch((error) => alert(error))
+    setError(null)
+    setIsSubmitting(true)
+    try {
+      await submitForm(
+        encodeForm({ 'form-name': form.getAttribute('name'), ...values }),
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      )
+      navigate(form.getAttribute('action'))
+    } catch (err) {
+      setError(err.message)
+      setIsSubmitting(false)
+    }
   }
 
-  render() {
-    return (
-      <Layout>
-        <section className="section">
-          <div className="container">
-            <div className="content">
-              <h1>Contact</h1>
-              <form
-                name="contact"
-                method="post"
-                action="/contact/thanks/"
-                data-netlify="true"
-                data-netlify-honeypot="bot-field"
-                onSubmit={this.handleSubmit}
-              >
-                {/* The `form-name` hidden field is required to support form submissions without JavaScript */}
-                <input type="hidden" name="form-name" value="contact" />
-                <div hidden>
-                  <label>
-                    Don’t fill this out:{' '}
-                    <input name="bot-field" onChange={this.handleChange} />
-                  </label>
+  return (
+    <Layout>
+      <section className="section">
+        <div className="container">
+          <div className="content">
+            <h1>Contact</h1>
+            <form
+              name="contact"
+              method="post"
+              action="/contact/thanks/"
+              data-netlify="true"
+              data-netlify-honeypot="bot-field"
+              onSubmit={handleSubmit}
+            >
+              {/* The `form-name` hidden field is required to support form submissions without JavaScript */}
+              <input type="hidden" name="form-name" value="contact" />
+              <div hidden>
+                <label>
+                  Don’t fill this out:{' '}
+                  <input name="bot-field" onChange={handleChange} />
+                </label>
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="name">
+                  Your name
+                </label>
+                <div className="control">
+                  <input
+                    className="input"
+                    type="text"
+                    name="name"
+                    onChange={handleChange}
+                    id="name"
+                    required
+                  />
                 </div>
-                <div className="field">
-                  <label className="label" htmlFor={'name'}>
-                    Your name
-                  </label>
-                  <div className="control">
-                    <input
-                      className="input"
-                      type={'text'}
-                      name={'name'}
-                      onChange={this.handleChange}
-                      id={'name'}
-                      required={true}
-                    />
-                  </div>
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="email">
+                  Email
+                </label>
+                <div className="control">
+                  <input
+                    className="input"
+                    type="email"
+                    name="email"
+                    onChange={handleChange}
+                    id="email"
+                    required
+                  />
                 </div>
-                <div className="field">
-                  <label className="label" htmlFor={'email'}>
-                    Email
-                  </label>
-                  <div className="control">
-                    <input
-                      className="input"
-                      type={'email'}
-                      name={'email'}
-                      onChange={this.handleChange}
-                      id={'email'}
-                      required={true}
-                    />
-                  </div>
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="message">
+                  Message
+                </label>
+                <div className="control">
+                  <textarea
+                    className="textarea"
+                    name="message"
+                    onChange={handleChange}
+                    id="message"
+                    required
+                  />
                 </div>
-                <div className="field">
-                  <label className="label" htmlFor={'message'}>
-                    Message
-                  </label>
-                  <div className="control">
-                    <textarea
-                      className="textarea"
-                      name={'message'}
-                      onChange={this.handleChange}
-                      id={'message'}
-                      required={true}
-                    />
-                  </div>
-                </div>
-                <div className="field">
-                  <button className="button is-link" type="submit">
-                    Send
-                  </button>
-                </div>
-              </form>
-            </div>
+              </div>
+              {error && (
+                <p className="notification is-danger" role="alert">
+                  {error}
+                </p>
+              )}
+              <div className="field">
+                <button
+                  className="button is-link"
+                  type="submit"
+                  disabled={isSubmitting}
+                >
+                  Send
+                </button>
+              </div>
+            </form>
           </div>
-        </section>
-      </Layout>
-    )
-  }
+        </div>
+      </section>
+    </Layout>
+  )
 }
+
+export default ContactPage
